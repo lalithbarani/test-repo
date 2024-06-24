@@ -1,29 +1,43 @@
-node {
-    try {
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing npm dependencies...'
+                sh 'npm install'
+            }
+        }
         stage('Build') {
-            echo 'Building...'
-            // Add your build steps here, e.g.,
-            // sh 'mvn clean install'
+            steps {
+                echo 'Building...'
+                sh 'npm run build'  // Adjust the command according to your project setup
+            }
         }
         stage('Test') {
-            echo 'Testing...'
-            // Add your test steps here, e.g.,
-            // sh 'mvn test'
+            steps {
+                echo 'Testing...'  // You can add npm test if you have a test script in package.json
+                // sh 'npm test'
+            }
         }
         stage('Deploy') {
-            echo 'Deploying...'
-            // Add your deploy steps here, e.g.,
-            // sh 'scp target/myapp.war user@server:/path/to/deploy'
+            steps {
+                echo 'Deploying...'  // Adjust the deploy command according to your setup
+                // Example: sh 'npm run deploy'
+            }
         }
-    } catch (Exception e) {
-        currentBuild.result = 'FAILURE'
-        throw e
-    } finally {
-        if (currentBuild.result == 'FAILURE') {
-            echo 'Pipeline failed.'
-        } else {
+    }
+
+    post {
+        always {
+            echo 'Cleaning up...'
+            // Optionally, clean up steps can be added here if needed
+        }
+        success {
             echo 'Pipeline succeeded.'
         }
-        echo 'Pipeline completed.'
+        failure {
+            echo 'Pipeline failed.'
+        }
     }
 }
